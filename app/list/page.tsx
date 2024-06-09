@@ -7,7 +7,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
 
-interface Props {}
+interface Props { }
 
 type queryType = {
 	dateOpened: string;
@@ -17,18 +17,17 @@ type queryType = {
 	userId: string;
 };
 
-const ListPage: NextPage<Props> = ({}) => {
+const ListPage: NextPage<Props> = ({ }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const isHydrated = useUserStore((state) => state.isHydrates);
 	const userData = useUserStore((state) => state.user);
-console.log(userData,"userData")
+	console.log(userData, "userData")
 	const [queryData, setQueryData] = useState<queryType[]>([]);
 	const router = useRouter();
 	const getQueriesData = async () => {
 		try {
 			let response = await axios.get(
-				`${API_URL}/queries?isAdmin=${
-					userData?.isAdmin ?? false
+				`${API_URL}/queries?isAdmin=${userData?.isAdmin ?? false
 				}&userId=${userData?.id ?? ""}`
 			);
 
@@ -93,32 +92,41 @@ console.log(userData,"userData")
 					</div>
 				</div>
 				{/* Table */}
-				{/* <div className="flex-col mx-16 space-y-6"> */}
-				{/* {userData?.username ?? ""} */}
-				{userData?.isAdmin ?<button
-											className="btn btn-primary hover:bg-slate-800 hover:text-white"
-											onClick={() =>
-												router.push("/signup")
-											}
-										>
-											{"Add User"}
-										</button>:""}
+				<div className="md:flex md:space-x-4">
+				{userData?.isAdmin ? <button
+					className="btn btn-primary hover:bg-slate-800 hover:text-white"
+					onClick={() =>
+						router.push("/signup")
+					}
+				>
+					{"Add User"}
+				</button> : ""}
 				<button
-											className="btn btn-primary hover:bg-slate-800 hover:text-white"
-											onClick={() =>
-												router.push("/dashboard")
-											}
-										>
-											{"Make Reservation "}
-										</button>
-										<button
-											className="btn btn-primary hover:bg-slate-800 hover:text-white"
-											onClick={() =>
-												router.push("/")
-											}
-										>
-											{"Sign Out "}
-										</button>
+					className="btn btn-primary hover:bg-slate-800 hover:text-white"
+					onClick={() =>
+						router.push("/dashboard")
+					}
+				>
+					{"Make Reservation "}
+				</button>
+				<button
+					className="btn btn-primary hover:bg-slate-800 hover:text-white"
+					onClick={() =>
+						router.push("/")
+					}
+				>
+					{"Sign Out "}
+				</button>
+				<button
+					className="btn btn-primary hover:bg-slate-800 hover:text-white"
+					onClick={() =>
+						router.push("/")
+					}
+				>
+					{"View Users "}
+				</button>
+
+				</div>
 				{/* </div> */}
 				<div className="overflow-x-auto">
 					<table className="table mt-4">
