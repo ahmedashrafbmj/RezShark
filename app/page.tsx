@@ -5,6 +5,7 @@ import axios, { AxiosError } from "axios";
 import { API_URL } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/utils/store";
+import { toast } from "react-toastify";
 
 export default function Home() {
 	const router = useRouter();
@@ -20,7 +21,7 @@ export default function Home() {
 
 		try {
 			if (!email || !password) {
-				alert("Email and password required");
+				toast.error("Email and password required");
 				return;
 			}
 
@@ -34,7 +35,7 @@ export default function Home() {
 			router.push("/list");
 		} catch (error: unknown) {
 			if (error instanceof AxiosError) {
-				alert(error.response?.data?.detail);
+				toast.error(error.response?.data?.detail);
 			}
 		}
 	};

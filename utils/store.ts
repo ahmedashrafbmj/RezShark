@@ -9,7 +9,7 @@ type user = {
 
 interface UserState {
 	user: user | null;
-	save: (u: user) => void;
+	save: (u: user | null) => void;
 	isHydrates: boolean;
 	setHasHydrated: (b: boolean) => void;
 }

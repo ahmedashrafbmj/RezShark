@@ -1,13 +1,15 @@
 "use client";
 
+import Loading from "@/components/loading";
 import { API_URL } from "@/utils/constants";
 import { useUserStore } from "@/utils/store";
 import axios from "axios";
 import { NextPage } from "next";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-interface Props { }
+interface Props {}
 
 type queryType = {
 	dateOpened: string;
@@ -17,17 +19,19 @@ type queryType = {
 	userId: string;
 };
 
-const ListPage: NextPage<Props> = ({ }) => {
+const ListPage: NextPage<Props> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const isHydrated = useUserStore((state) => state.isHydrates);
 	const userData = useUserStore((state) => state.user);
-	console.log(userData, "userData")
+	const setUser = useUserStore((state) => state.save);
+
 	const [queryData, setQueryData] = useState<queryType[]>([]);
 	const router = useRouter();
 	const getQueriesData = async () => {
 		try {
 			let response = await axios.get(
-				`${API_URL}/queries?isAdmin=${userData?.isAdmin ?? false
+				`${API_URL}/queries?isAdmin=${
+					userData?.isAdmin ?? false
 				}&userId=${userData?.id ?? ""}`
 			);
 
@@ -40,13 +44,19 @@ const ListPage: NextPage<Props> = ({ }) => {
 		}
 	};
 
-	const handleUpdateStatus = async (id: string) => {
+	const handleUpdateStatus = async (id: string, status: boolean) => {
 		setIsLoading(true);
 
 		try {
 			await axios.put(`${API_URL}/toggleStatus`, {
 				queryId: id,
 			});
+
+			if (status === true) {
+				toast.success("Service Stop Successfully");
+			} else {
+				toast.success("Service Start Successfully");
+			}
 			getQueriesData();
 		} catch (error) {
 			console.log("ERROR", error);
@@ -55,6 +65,10 @@ const ListPage: NextPage<Props> = ({ }) => {
 
 	useEffect(() => {
 		if (isHydrated) {
+			if (userData == null) {
+				redirect("/");
+			}
+
 			getQueriesData();
 		}
 	}, [isHydrated]);
@@ -68,9 +82,7 @@ const ListPage: NextPage<Props> = ({ }) => {
 	}
 
 	return isLoading ? (
-		<div className="h-screen flex justify-center items-center">
-			<span className="loading loading-spinner text-primary w-20 h-20"></span>
-		</div>
+		<Loading />
 	) : (
 		<div className="flex-col ">
 			<div className="w-full h-24 bg-blue-700 flex justify-center items-center">
@@ -93,39 +105,39 @@ const ListPage: NextPage<Props> = ({ }) => {
 				</div>
 				{/* Table */}
 				<div className="md:flex md:space-x-4">
-				{userData?.isAdmin ? <button
-					className="btn btn-primary hover:bg-slate-800 hover:text-white"
-					onClick={() =>
-						router.push("/signup")
-					}
-				>
-					{"Add User"}
-				</button> : ""}
-				<button
-					className="btn btn-primary hover:bg-slate-800 hover:text-white"
-					onClick={() =>
-						router.push("/dashboard")
-					}
-				>
-					{"Make Reservation "}
-				</button>
-				<button
-					className="btn btn-primary hover:bg-slate-800 hover:text-white"
-					onClick={() =>
-						router.push("/")
-					}
-				>
-					{"Sign Out "}
-				</button>
-				<button
-					className="btn btn-primary hover:bg-slate-800 hover:text-white"
-					onClick={() =>
-						router.push("/")
-					}
-				>
-					{"View Users "}
-				</button>
-
+					{userData?.isAdmin ? (
+						<button
+							className="btn btn-primary hover:bg-slate-800 hover:text-white"
+							onClick={() => router.push("/signup")}
+						>
+							{"Add User"}
+						</button>
+					) : (
+						""
+					)}
+					<button
+						className="btn btn-primary hover:bg-slate-800 hover:text-white"
+						onClick={() => router.push("/dashboard")}
+					>
+						{"Make Reservation "}
+					</button>
+					{userData?.isAdmin ? (
+						<button
+							className="btn btn-primary hover:bg-slate-800 hover:text-white"
+							onClick={() => router.push("/users")}
+						>
+							{"View Users "}
+						</button>
+					) : null}
+					<button
+						className="btn btn-primary hover:bg-slate-800 hover:text-white"
+						onClick={() => {
+							setUser(null);
+							router.push("/");
+						}}
+					>
+						{"Sign Out "}
+					</button>
 				</div>
 				{/* </div> */}
 				<div className="overflow-x-auto">
@@ -159,7 +171,10 @@ const ListPage: NextPage<Props> = ({ }) => {
 										<button
 											className="btn btn-primary hover:bg-slate-800 hover:text-white"
 											onClick={() =>
-												handleUpdateStatus(data.id)
+												handleUpdateStatus(
+													data.id,
+													data.status
+												)
 											}
 										>
 											{data.status

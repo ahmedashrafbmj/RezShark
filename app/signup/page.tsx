@@ -5,6 +5,7 @@ import axios, { AxiosError } from "axios";
 import { API_URL } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/utils/store";
+import { toast } from "react-toastify";
 
 export default function Signup() {
 	const router = useRouter();
@@ -21,24 +22,24 @@ export default function Signup() {
 
 		try {
 			if (!email || !password) {
-				alert("Email and password required");
+				toast.error("Email and password required");
 				return;
 			}
 
 			let response = await axios.post(`${API_URL}/signup`, {
 				email: email,
 				password: password,
-                username: userName,
-                isAdmin: false
+				username: userName,
+				isAdmin: false,
 			});
 
-			// setUser(response.data);
-            alert("User Added Succesfully")
+			toast.success("User Added Succesfully");
 
+			setUser(response.data);
 			router.push("/list");
 		} catch (error: unknown) {
 			if (error instanceof AxiosError) {
-				alert(error.response?.data?.detail);
+				toast.error(error.response?.data?.detail);
 			}
 		}
 	};
@@ -80,6 +81,7 @@ export default function Signup() {
 										type="text"
 										className="grow"
 										placeholder="Email"
+										value={email}
 										onChange={(e) =>
 											setEmail(e.target.value)
 										}
@@ -89,7 +91,9 @@ export default function Signup() {
 
 							<div>
 								<div className="label mt-1">
-									<span className="label-text">User Name</span>
+									<span className="label-text">
+										User Name
+									</span>
 								</div>
 								<label className="input input-bordered flex items-center gap-2">
 									<svg
@@ -105,6 +109,7 @@ export default function Signup() {
 										type="text"
 										className="grow"
 										placeholder="User Name"
+										value={userName}
 										onChange={(e) =>
 											setUserName(e.target.value)
 										}
@@ -129,6 +134,7 @@ export default function Signup() {
 										type="password"
 										className="grow"
 										placeholder="Password"
+										value={password}
 										onChange={(e) =>
 											setPassword(e.target.value)
 										}
