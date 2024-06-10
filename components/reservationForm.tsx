@@ -6,7 +6,7 @@ export default function ReservationForm() {
 			</span>
 
 			<form className="space-y-8">
-				<div className="md:flex justify-between mt-4 md:space-x-10">
+				<div className="md:flex justify-between mt-4 bg-slate-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
 					<div className="flex-col w-full">
 						<div className="label mt-1">
 							<span className="label-text">
