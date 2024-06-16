@@ -15,7 +15,6 @@ type queryType = {
 	dateOpened: string;
 	id: string;
 	status: boolean;
-	type: string;
 	userId: string;
 };
 
@@ -30,7 +29,7 @@ const ListPage: NextPage<Props> = ({}) => {
 	const getQueriesData = async () => {
 		try {
 			let response = await axios.get(
-				`${API_URL}/queries?isAdmin=${
+				`${API_URL}/reservations?isAdmin=${
 					userData?.isAdmin ?? false
 				}&userId=${userData?.id ?? ""}`
 			);
@@ -94,20 +93,25 @@ const ListPage: NextPage<Props> = ({}) => {
 				<div className="md:flex md:space-x-4">
 					<div className="flex-1 flex h-20 bg-slate-700 mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
-							Golf
+							Entertainment
 						</span>
 					</div>
 					<div className="flex-1 flex h-20 bg-slate-500 mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
-							Restaurants
+							Travel
+						</span>
+					</div>
+					<div className="flex-1 flex h-20 bg-slate-700 mt-8 justify-center items-center">
+						<span className="text-xl text-white font-bold">
+							Dining
 						</span>
 					</div>
 				</div>
 				{/* Table */}
-				<div className="md:flex md:space-x-4">
+				<div className="md:flex md:justify-between md:space-x-4">
 					{userData?.isAdmin ? (
 						<button
-							className="btn btn-primary hover:bg-slate-800 hover:text-white"
+							className="flex-1 btn btn-primary hover:bg-slate-800 hover:text-white"
 							onClick={() => router.push("/signup")}
 						>
 							{"Add User"}
@@ -116,21 +120,21 @@ const ListPage: NextPage<Props> = ({}) => {
 						""
 					)}
 					<button
-						className="btn btn-primary hover:bg-slate-800 hover:text-white"
+						className="flex-1 btn btn-primary hover:bg-slate-800 hover:text-white"
 						onClick={() => router.push("/dashboard")}
 					>
 						{"Make Reservation "}
 					</button>
 					{userData?.isAdmin ? (
 						<button
-							className="btn btn-primary hover:bg-slate-800 hover:text-white"
+							className="flex-1 btn btn-primary hover:bg-slate-800 hover:text-white"
 							onClick={() => router.push("/users")}
 						>
 							{"View Users "}
 						</button>
 					) : null}
 					<button
-						className="btn btn-primary hover:bg-slate-800 hover:text-white"
+						className="flex-1 btn btn-primary hover:bg-slate-800 hover:text-white"
 						onClick={() => {
 							setUser(null);
 							router.push("/");
@@ -139,13 +143,39 @@ const ListPage: NextPage<Props> = ({}) => {
 						{"Sign Out "}
 					</button>
 				</div>
-				{/* </div> */}
+
+				<div className="md:h-2 h-0" />
+
 				<div className="overflow-x-auto">
+					<span className="text-4xl font-bold">
+						Upcoming Reservations
+					</span>
 					<table className="table mt-4">
 						{/* head */}
 						<thead>
 							<tr className="bg-slate-700 text-white text-lg">
-								<th>Type</th>
+								<th>Request Number</th>
+								<th>Date Opened</th>
+								<th>Status</th>
+								<th>Click to Stop</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+				<div className="md:h-2 h-0" />
+
+				{/* </div> */}
+				<div className="overflow-x-auto">
+					<span className="text-4xl font-bold">
+						Pending Reservations
+					</span>
+					<table className="table mt-4">
+						{/* head */}
+						<thead>
+							<tr className="bg-slate-700 text-white text-lg">
+								<th>Request Number</th>
 								<th>Date Opened</th>
 								<th>Status</th>
 								<th>Click to Stop</th>
@@ -156,7 +186,7 @@ const ListPage: NextPage<Props> = ({}) => {
 								<tr key={data.id}>
 									<td>
 										<span className="text-base">
-											{data.type}
+											{data.id}
 										</span>
 									</td>
 									<td>
