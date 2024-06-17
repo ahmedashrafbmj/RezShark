@@ -14,19 +14,24 @@ interface Props {}
 type queryType = {
 	dateOpened: string;
 	id: string;
+	resName: string;
+	type: string;
 	status: boolean;
 	userId: string;
 };
 
 const ListPage: NextPage<Props> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const [tableLoading, setTableLoading] = useState(false);
 	const isHydrated = useUserStore((state) => state.isHydrates);
 	const userData = useUserStore((state) => state.user);
 	const setUser = useUserStore((state) => state.save);
 
 	const [queryData, setQueryData] = useState<queryType[]>([]);
+	const [upcomingData, setUpcomingData] = useState<queryType[]>([]);
 	const router = useRouter();
 	const getQueriesData = async () => {
+		setTableLoading(true);
 		try {
 			let response = await axios.get(
 				`${API_URL}/reservations?isAdmin=${
@@ -34,12 +39,23 @@ const ListPage: NextPage<Props> = ({}) => {
 				}&userId=${userData?.id ?? ""}`
 			);
 
-			setQueryData(response.data);
+			if (response.data?.length > 0) {
+				let completeData = response.data.filter(
+					(d: queryType) => d.type == "Booking Complete"
+				);
+				let otherData = response.data.filter(
+					(d: queryType) => d.type != "Booking Complete"
+				);
+
+				setUpcomingData(completeData);
+				setQueryData(otherData);
+			}
 		} catch (error) {
 			console.log("ERROR", error);
 			setQueryData([]);
 		} finally {
 			setIsLoading(false);
+			setTableLoading(false);
 		}
 	};
 
@@ -146,77 +162,114 @@ const ListPage: NextPage<Props> = ({}) => {
 
 				<div className="md:h-2 h-0" />
 
-				<div className="overflow-x-auto">
-					<span className="text-4xl font-bold">
-						Upcoming Reservations
-					</span>
-					<table className="table mt-4">
-						{/* head */}
-						<thead>
-							<tr className="bg-slate-700 text-white text-lg">
-								<th>Request Number</th>
-								<th>Date Opened</th>
-								<th>Status</th>
-								<th>Click to Stop</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
+				{tableLoading ? (
+					<div className="flex justify-center items-center">
+						<span className="loading loading-spinner text-primary w-6 h-6"></span>
+					</div>
+				) : (
+					<div className="overflow-x-auto">
+						<span className="text-4xl font-bold">
+							Upcoming Reservations
+						</span>
+						<table className="table mt-4">
+							{/* head */}
+							<thead>
+								<tr className="bg-slate-700 text-white text-lg">
+									<th>Request Number</th>
+									<th>Reservation Name</th>
+									<th>Date Opened</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								{upcomingData?.map((data) => (
+									<tr key={data.id}>
+										<td>
+											<span className="text-base">
+												{data.id}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												{data.resName}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												{data.dateOpened}
+											</span>
+										</td>
+										<td>{data.type}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
 
 				<div className="md:h-2 h-0" />
 
 				{/* </div> */}
-				<div className="overflow-x-auto">
-					<span className="text-4xl font-bold">
-						Pending Reservations
-					</span>
-					<table className="table mt-4">
-						{/* head */}
-						<thead>
-							<tr className="bg-slate-700 text-white text-lg">
-								<th>Request Number</th>
-								<th>Date Opened</th>
-								<th>Status</th>
-								<th>Click to Stop</th>
-							</tr>
-						</thead>
-						<tbody>
-							{queryData?.map((data) => (
-								<tr key={data.id}>
-									<td>
-										<span className="text-base">
-											{data.id}
-										</span>
-									</td>
-									<td>
-										<span className="text-base">
-											{data.dateOpened}
-										</span>
-									</td>
-									<td>
-										{data.status ? "Active" : "In Active"}
-									</td>
-									<th>
-										<button
-											className="btn btn-primary hover:bg-slate-800 hover:text-white"
-											onClick={() =>
-												handleUpdateStatus(
-													data.id,
-													data.status
-												)
-											}
-										>
-											{data.status
-												? "Stop Service"
-												: "Start Service"}
-										</button>
-									</th>
+				{tableLoading ? (
+					<div className="flex justify-center items-center">
+						<span className="loading loading-spinner text-primary w-6 h-6"></span>
+					</div>
+				) : (
+					<div className="overflow-x-auto">
+						<span className="text-4xl font-bold">
+							Pending Reservations
+						</span>
+						<table className="table mt-4">
+							{/* head */}
+							<thead>
+								<tr className="bg-slate-700 text-white text-lg">
+									<th>Request Number</th>
+									<th>Reservation Name</th>
+									<th>Date Opened</th>
+									<th>Status</th>
+									<th>Click to Stop</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
+							</thead>
+							<tbody>
+								{queryData?.map((data) => (
+									<tr key={data.id}>
+										<td>
+											<span className="text-base">
+												{data.id}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												{data.resName}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												{data.dateOpened}
+											</span>
+										</td>
+										<td>{data.type}</td>
+										<th>
+											<button
+												className="btn btn-primary hover:bg-slate-800 hover:text-white"
+												onClick={() =>
+													handleUpdateStatus(
+														data.id,
+														data.status
+													)
+												}
+											>
+												{data.status
+													? "Stop Service"
+													: "Start Service"}
+											</button>
+										</th>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
 			</div>
 		</div>
 	);

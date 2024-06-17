@@ -6,6 +6,7 @@ import React, { FormEvent, useState } from "react";
 import { toast } from "react-toastify";
 
 type error = {
+	resName?: string;
 	email?: string;
 	password?: string;
 	gameDate?: string;
@@ -32,6 +33,7 @@ export default function ReservationForm() {
 
 	const router = useRouter();
 
+	const [resName, setResName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [gameDate, setGameDate] = useState("");
@@ -70,6 +72,8 @@ export default function ReservationForm() {
 		const newErrors: error = {};
 
 		// Validate required fields
+		if (!resName.trim()) newErrors.resName = "Rservation Name is required";
+
 		if (!email.trim() && !validateEmail(email)) {
 			newErrors.email = "Email is required";
 		} else if (!validateEmail(email)) {
@@ -122,6 +126,7 @@ export default function ReservationForm() {
 
 				await axios.post(`${API_URL}/addReservation`, {
 					userId: userData?.id,
+					resName,
 					email,
 					password,
 					gameDate,
@@ -130,7 +135,7 @@ export default function ReservationForm() {
 					playerCount,
 					name,
 					confirmationEmail,
-					ccEmails,
+					ccEmails: ccEmails.split(",") ?? [""],
 					hideInBackground,
 					selectCourses,
 					dateOpened: new Date().toLocaleString("en-US"),
@@ -152,6 +157,24 @@ export default function ReservationForm() {
 			</span>
 
 			<form className="space-y-8" onSubmit={handleSubmit}>
+				<div className="bg-slate-700 p-4 text-white flex-col w-full rounded-xl">
+					<div className="label mt-1">
+						<span className="label-text">Reservation Name</span>
+					</div>
+					<label className="input input-bordered flex items-center gap-2">
+						<input
+							type="text"
+							className="grow"
+							placeholder="Reservation Name"
+							value={resName}
+							onChange={(e) => setResName(e.target.value)}
+						/>
+					</label>
+					{errors.resName && (
+						<p className="text-red-500 mt-2">{errors.resName}</p>
+					)}
+				</div>
+
 				<div className="md:flex justify-between mt-4 bg-slate-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
 					<div className="flex-col w-full">
 						<div className="label mt-1">
