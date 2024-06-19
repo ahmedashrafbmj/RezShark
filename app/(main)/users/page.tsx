@@ -1,5 +1,7 @@
 "use client";
+import Header from "@/components/header";
 import Loading from "@/components/loading";
+import { withAuth } from "@/components/withAuth";
 import { API_URL } from "@/utils/constants";
 import { useUserStore } from "@/utils/store";
 import axios from "axios";
@@ -13,7 +15,7 @@ type UserData = {
 	isAdmin: boolean;
 };
 
-export default function Users() {
+function Users() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [userData, setUserData] = useState<UserData[]>([]);
 	const currentUser = useUserStore((state) => state.user);
@@ -55,12 +57,9 @@ export default function Users() {
 		<Loading />
 	) : (
 		<div className="flex-col ">
-			<div className="w-full h-24 bg-blue-700 flex justify-center items-center">
-				<span className="text-2xl text-white font-bold">
-					Welcome, {currentUser?.username ?? ""}
-				</span>
-			</div>
-			<div className="flex-col mx-16 space-y-6">
+			<Header title="All Users List" showBack />
+
+			<div className="flex-col md:mx-16 mx-4 space-y-6">
 				{/* Table */}
 				{/* </div> */}
 				<div className="overflow-x-auto">
@@ -107,3 +106,5 @@ export default function Users() {
 		</div>
 	);
 }
+
+export default withAuth(Users);

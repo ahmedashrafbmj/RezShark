@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 export default function Home() {
 	const router = useRouter();
 
+	const [isLoading, setIsLoading] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -19,12 +20,14 @@ export default function Home() {
 		e.preventDefault();
 		e.stopPropagation();
 
+		if (isLoading) return;
+
 		try {
 			if (!email || !password) {
 				toast.error("Email and password required");
 				return;
 			}
-
+			setIsLoading(true);
 			let response = await axios.post(`${API_URL}/login`, {
 				email: email,
 				password: password,
@@ -32,11 +35,13 @@ export default function Home() {
 
 			setUser(response.data);
 
-			router.push("/list");
+			router.replace("/list");
 		} catch (error: unknown) {
 			if (error instanceof AxiosError) {
 				toast.error(error.response?.data?.detail);
 			}
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -113,7 +118,11 @@ export default function Home() {
 								className="btn btn-primary  bg-blue-500 text-white w-full mt-4 hover:bg-blue-400"
 								type="submit"
 							>
-								Login
+								{isLoading ? (
+									<span className="loading loading-spinner text-white"></span>
+								) : (
+									"Login"
+								)}
 							</button>
 						</form>
 					</div>

@@ -2,8 +2,9 @@ import { API_URL } from "@/utils/constants";
 import { useUserStore } from "@/utils/store";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Loading from "./loading";
 
 type error = {
 	resName?: string;
@@ -28,10 +29,34 @@ type selectedCourses = {
 	yellow: boolean;
 };
 
+type queryType = {
+	id: string;
+	resName: string;
+	name: string;
+	email: string;
+	password: string;
+	dateOpened: string;
+	confirmationEmail: string;
+	ccEmails: string[];
+	selectCourses: number[];
+	gameDate: string;
+	type: string;
+	status: boolean;
+	userId: string;
+	earliestTime: string;
+	latestTime: string;
+	playerCount: number;
+};
+
 export default function ReservationForm() {
 	const userData = useUserStore((state) => state.user);
 
 	const router = useRouter();
+
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [resData, setResData] = useState<queryType[]>([]);
+	const [showDropdown, setShowDropdown] = useState(false);
 
 	const [resName, setResName] = useState("");
 	const [email, setEmail] = useState("");
@@ -59,6 +84,27 @@ export default function ReservationForm() {
 		setSelectedCourses({
 			...selectedCourses,
 			[name]: checked,
+		});
+	};
+
+	const resetStates = () => {
+		setResName("");
+		setEmail("");
+		setPassword("");
+		setGameDate("");
+		setEarliestTime("");
+		setLatestTime("");
+		setPlayerCount("");
+		setName("");
+		setConfirmationEmail("");
+		setCcEmails("");
+		setHideInBackground(true);
+		setSelectedCourses({
+			black: false,
+			blue: false,
+			green: false,
+			red: false,
+			yellow: false,
 		});
 	};
 
@@ -103,6 +149,7 @@ export default function ReservationForm() {
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors);
 		} else {
+			setIsLoading(true);
 			try {
 				// If no errors, submit the form data
 				// ['black', 'blue', 'green', 'red', 'yellow']
@@ -135,28 +182,124 @@ export default function ReservationForm() {
 					playerCount,
 					name,
 					confirmationEmail,
-					ccEmails: ccEmails.split(",") ?? [""],
+					ccEmails: ccEmails.includes("\n")
+						? ccEmails.split("\n").join(",").split(",")
+						: ccEmails.split(",") ?? [""],
 					hideInBackground,
 					selectCourses,
 					dateOpened: new Date().toLocaleString("en-US"),
 				});
 
+				resetStates();
+				getQueriesData();
 				toast.success("Reservation Added Succesfully");
-
-				router.back();
 			} catch (error) {
 				toast.error("Reservation Failed");
+			} finally {
+				setIsLoading(false);
 			}
 		}
 	};
 
-	return (
-		<div className="flex-col justify-start text-center items-center px-6 py-8 bg-slate-100">
-			<span className="text-2xl font-bold text-black ">
-				Tee Time Reservation Finder
-			</span>
+	const getQueriesData = async () => {
+		setIsLoading(true);
+		try {
+			let response = await axios.get(
+				`${API_URL}/reservations?isAdmin=${
+					userData?.isAdmin ?? false
+				}&userId=${userData?.id ?? ""}&showType=false`
+			);
 
+			if (response.data?.length > 0) {
+				setResData(response.data);
+			}
+		} catch (error) {
+			console.log("ERROR", error);
+			setResData([]);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const onAutoFillSelect = (data: queryType) => {
+		setResName(data.resName);
+		setEmail(data.email);
+		setPassword(data.password);
+		setGameDate(data.gameDate);
+		setEarliestTime(data.earliestTime);
+		setLatestTime(data.latestTime);
+		setPlayerCount(data.playerCount.toString());
+		setName(data.name);
+		setConfirmationEmail(data.confirmationEmail);
+		setCcEmails(data.ccEmails.toString());
+
+		const coursesMapping = {
+			0: "black",
+			1: "blue",
+			2: "green",
+			3: "red",
+			4: "yellow",
+		};
+
+		const newSelectedCourses: selectedCourses = {
+			black: false,
+			blue: false,
+			green: false,
+			red: false,
+			yellow: false,
+		};
+
+		data.selectCourses.forEach((course, index) => {
+			const courseName = coursesMapping[
+				index as keyof typeof coursesMapping
+			] as keyof selectedCourses;
+			if (courseName) {
+				newSelectedCourses[courseName] = course === 1;
+			}
+		});
+
+		setSelectedCourses(newSelectedCourses);
+
+		setShowDropdown(false);
+	};
+
+	useEffect(() => {
+		getQueriesData();
+	}, []);
+
+	return isLoading ? (
+		<Loading />
+	) : (
+		<div className="flex-col justify-start text-center items-center px-6 py-8 bg-white">
 			<form className="space-y-8" onSubmit={handleSubmit}>
+				<div className="bg-slate-700 p-4 text-white flex-col w-full rounded-xl">
+					<div className="dropdown dropdown-bottom w-full">
+						<div
+							tabIndex={0}
+							role="button"
+							className="btn m-1 bg-blue-700 hover:bg-blue-700 text-white w-full  text-lg"
+							onClick={() => setShowDropdown((p) => !p)}
+						>
+							Auto Fill Reservation
+						</div>
+						<ul
+							tabIndex={0}
+							hidden={!showDropdown}
+							className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
+						>
+							{resData?.map((data) => (
+								<li
+									key={data.id}
+									className="py-2 hover:bg-slate-300 hover:cursor-pointer"
+									onClick={() => onAutoFillSelect(data)}
+								>
+									{data.resName}
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+
 				<div className="bg-slate-700 p-4 text-white flex-col w-full rounded-xl">
 					<div className="label mt-1">
 						<span className="label-text">Reservation Name</span>
@@ -450,7 +593,7 @@ export default function ReservationForm() {
 
 				<div className="flex space-x-2 justify-center">
 					<button
-						className="btn bg-purple-500 w-1/3 text-lg h-16 text-white hover:bg-purple-400"
+						className="btn bg-purple-500 md:w-1/3 w-full text-lg h-16 text-white hover:bg-purple-400"
 						type="submit"
 					>
 						Add Reservation

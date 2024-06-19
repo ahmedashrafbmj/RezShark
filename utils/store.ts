@@ -31,4 +31,14 @@ const useUserStore = create<UserState>()(
 	)
 );
 
-export { useUserStore };
+interface SideBarState {
+	isOpen: boolean;
+	setIsOpen: () => void;
+}
+
+const sideBarStore = create<SideBarState>()((set) => ({
+	isOpen: false,
+	setIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+}));
+
+export { useUserStore, sideBarStore };

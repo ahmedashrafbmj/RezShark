@@ -1,6 +1,8 @@
 "use client";
 
+import Header from "@/components/header";
 import Loading from "@/components/loading";
+import { withAuth } from "@/components/withAuth";
 import { API_URL } from "@/utils/constants";
 import { useUserStore } from "@/utils/store";
 import axios from "axios";
@@ -18,12 +20,15 @@ type queryType = {
 	type: string;
 	status: boolean;
 	userId: string;
+	earliestTime: string;
+	gameDate: string;
+	latestTime: string;
+	playerCount: number;
 };
 
 const ListPage: NextPage<Props> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [tableLoading, setTableLoading] = useState(false);
-	const isHydrated = useUserStore((state) => state.isHydrates);
 	const userData = useUserStore((state) => state.user);
 	const setUser = useUserStore((state) => state.save);
 
@@ -79,52 +84,36 @@ const ListPage: NextPage<Props> = ({}) => {
 	};
 
 	useEffect(() => {
-		if (isHydrated) {
-			if (userData == null) {
-				redirect("/");
-			}
-
-			getQueriesData();
-		}
-	}, [isHydrated]);
-
-	if (!isHydrated) {
-		return (
-			<div className="h-screen flex justify-center items-center">
-				<span className="loading loading-spinner text-primary w-20 h-20"></span>
-			</div>
-		);
-	}
+		getQueriesData();
+	}, []);
 
 	return isLoading ? (
 		<Loading />
 	) : (
 		<div className="flex-col ">
-			<div className="w-full h-24 bg-blue-700 flex justify-center items-center">
-				<span className="text-2xl text-white font-bold">
-					Welcome, {userData?.username ?? ""}
-				</span>
-			</div>
+			<Header title={`Welcome, ${userData?.username ?? ""}`} />
+
 			<div className="flex-col mx-16 space-y-6">
-				<div className="md:flex md:space-x-4">
-					<div className="flex-1 flex h-20 bg-slate-700 mt-8 justify-center items-center">
+				<div className="md:flex md:space-x-4 mb-8">
+					<div className="flex-1 flex h-20 bg-[#0000A0] mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
 							Entertainment
 						</span>
 					</div>
-					<div className="flex-1 flex h-20 bg-slate-500 mt-8 justify-center items-center">
+					<div className="flex-1 flex h-20 bg-[#5042FF] mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
 							Travel
 						</span>
 					</div>
-					<div className="flex-1 flex h-20 bg-slate-700 mt-8 justify-center items-center">
+					<div className="flex-1 flex h-20 bg-[#0000A0] mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
 							Dining
 						</span>
 					</div>
 				</div>
+
 				{/* Table */}
-				<div className="md:flex md:justify-between md:space-x-4">
+				{/* <div className="md:flex md:justify-between md:space-x-4">
 					{userData?.isAdmin ? (
 						<button
 							className="flex-1 btn btn-primary hover:bg-slate-800 hover:text-white"
@@ -158,9 +147,7 @@ const ListPage: NextPage<Props> = ({}) => {
 					>
 						{"Sign Out "}
 					</button>
-				</div>
-
-				<div className="md:h-2 h-0" />
+				</div> */}
 
 				{tableLoading ? (
 					<div className="flex justify-center items-center">
@@ -179,6 +166,10 @@ const ListPage: NextPage<Props> = ({}) => {
 									<th>Reservation Name</th>
 									<th>Date Opened</th>
 									<th>Status</th>
+									<th>Game Date</th>
+									<th>Earliest Time</th>
+									<th>Latest Time</th>
+									<th>Player Count</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -200,6 +191,10 @@ const ListPage: NextPage<Props> = ({}) => {
 											</span>
 										</td>
 										<td>{data.type}</td>
+										<td>{data.gameDate}</td>
+										<td>{data.earliestTime}</td>
+										<td>{data.latestTime}</td>
+										<td>{data.playerCount}</td>
 									</tr>
 								))}
 							</tbody>
@@ -227,6 +222,10 @@ const ListPage: NextPage<Props> = ({}) => {
 									<th>Reservation Name</th>
 									<th>Date Opened</th>
 									<th>Status</th>
+									<th>Game Date</th>
+									<th>Earliest Time</th>
+									<th>Latest Time</th>
+									<th>Player Count</th>
 									<th>Click to Stop</th>
 								</tr>
 							</thead>
@@ -249,6 +248,10 @@ const ListPage: NextPage<Props> = ({}) => {
 											</span>
 										</td>
 										<td>{data.type}</td>
+										<td>{data.gameDate}</td>
+										<td>{data.earliestTime}</td>
+										<td>{data.latestTime}</td>
+										<td>{data.playerCount}</td>
 										<th>
 											<button
 												className="btn btn-primary hover:bg-slate-800 hover:text-white"
@@ -275,4 +278,4 @@ const ListPage: NextPage<Props> = ({}) => {
 	);
 };
 
-export default ListPage;
+export default withAuth(ListPage);
