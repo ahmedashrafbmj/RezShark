@@ -1,4 +1,4 @@
 // const API_URL = "https://dev.rezshark.com";
-const API_URL = "http://localhost:8000";
+const API_URL = "https://dev.rezshark.com";
 
 export { API_URL };
