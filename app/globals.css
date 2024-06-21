@@ -35,5 +35,9 @@
 }
 
 .custom-container {
-	background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+	background: linear-gradient(
+		121.7deg,
+		rgb(41, 116, 250) 22.9%,
+		rgb(67, 212, 255) 69%
+	);
 }

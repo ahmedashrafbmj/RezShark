@@ -15,7 +15,7 @@ const Sidebar = () => {
 
 	return (
 		<div
-			className={`fixed inset-0 bg-[#342C49] text-white w-64 transform ${
+			className={`fixed inset-0 bg-gray-900 text-white w-64 transform ${
 				sideBarOpen ? "translate-x-0" : "-translate-x-full"
 			} transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:h-screen flex flex-col z-50`}
 		>
@@ -41,11 +41,11 @@ const Sidebar = () => {
 						}}
 					>
 						<li
-							className={`p-6 hover:bg-[#5042FF] font-bold ${
-								currentPage == "/list" ? "bg-[#5042FF]" : ""
+							className={`p-6 hover:bg-blue-700 font-bold ${
+								currentPage == "/list" ? "bg-blue-700" : ""
 							}`}
 						>
-							All List
+							Dashboard
 						</li>
 					</Link>
 					<Link
@@ -57,10 +57,8 @@ const Sidebar = () => {
 						}}
 					>
 						<li
-							className={`p-6 hover:bg-[#5042FF] font-bold ${
-								currentPage == "/dashboard"
-									? "bg-[#5042FF]"
-									: ""
+							className={`p-6 hover:bg-blue-700 font-bold ${
+								currentPage == "/dashboard" ? "bg-blue-700" : ""
 							}`}
 						>
 							Make Reservation
@@ -76,9 +74,9 @@ const Sidebar = () => {
 							}}
 						>
 							<li
-								className={`p-6 hover:bg-[#5042FF] font-bold ${
+								className={`p-6 hover:bg-blue-700 font-bold ${
 									currentPage == "/signup"
-										? "bg-[#5042FF]"
+										? "bg-blue-700"
 										: ""
 								}`}
 							>
@@ -96,10 +94,8 @@ const Sidebar = () => {
 							}}
 						>
 							<li
-								className={`p-6 hover:bg-[#5042FF] font-bold ${
-									currentPage == "/users"
-										? "bg-[#5042FF]"
-										: ""
+								className={`p-6 hover:bg-blue-700 font-bold ${
+									currentPage == "/users" ? "bg-blue-700" : ""
 								}`}
 							>
 								View Users
@@ -115,7 +111,7 @@ const Sidebar = () => {
 						}}
 						href={"/"}
 					>
-						<li className={`p-6 hover:bg-[#5042FF] font-bold`}>
+						<li className={`p-6 hover:bg-blue-700 font-bold`}>
 							Sign Out
 						</li>
 					</Link>

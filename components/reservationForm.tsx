@@ -272,12 +272,12 @@ export default function ReservationForm() {
 	) : (
 		<div className="flex-col justify-start text-center items-center px-6 py-8 bg-white">
 			<form className="space-y-8" onSubmit={handleSubmit}>
-				<div className="bg-slate-700 p-4 text-white flex-col w-full rounded-xl">
+				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
 					<div className="dropdown dropdown-bottom w-full">
 						<div
 							tabIndex={0}
 							role="button"
-							className="btn m-1 bg-blue-700 hover:bg-blue-700 text-white w-full  text-lg"
+							className="btn m-1 bg-blue-500 hover:bg-blue-600 text-white w-full  text-lg"
 							onClick={() => setShowDropdown((p) => !p)}
 						>
 							Auto Fill Reservation
@@ -300,7 +300,7 @@ export default function ReservationForm() {
 					</div>
 				</div>
 
-				<div className="bg-slate-700 p-4 text-white flex-col w-full rounded-xl">
+				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
 					<div className="label mt-1">
 						<span className="label-text">Reservation Name</span>
 					</div>
@@ -318,7 +318,7 @@ export default function ReservationForm() {
 					)}
 				</div>
 
-				<div className="md:flex justify-between mt-4 bg-slate-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
+				<div className="md:flex justify-between mt-4 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
 					<div className="flex-col w-full">
 						<div className="label mt-1">
 							<span className="label-text">
@@ -383,7 +383,7 @@ export default function ReservationForm() {
 				</div>
 
 				<div className="sm:flex sm:space-x-8 space-y-4 sm:space-y-0">
-					<div className="flex-1 bg-slate-700 p-4 text-white dark:[color-scheme:dark] rounded-xl  space-y-4">
+					<div className="flex-1 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl  space-y-4">
 						<div className="flex-col w-full">
 							<div className="label mt-1">
 								<span className="label-text">Game Date</span>
@@ -491,7 +491,7 @@ export default function ReservationForm() {
 							)}
 						</div>
 					</div>
-					<div className="flex-1  bg-slate-700  rounded-xl   p-4 text-white">
+					<div className="flex-1  bg-gray-700  rounded-xl   p-4 text-white">
 						<span className="label-text text-lg font-bold">
 							Select Courses to Search
 						</span>
@@ -525,7 +525,7 @@ export default function ReservationForm() {
 						)}
 					</div>
 				</div>
-				<div className="flex-col space-y-6 bg-slate-700 text-white dark:[color-scheme:dark] rounded-xl  p-6">
+				<div className="flex-col space-y-6 bg-gray-700 text-white dark:[color-scheme:dark] rounded-xl  p-6">
 					<div className="flex-col w-full">
 						<div className="label mt-1">
 							<span className="label-text">
@@ -593,7 +593,7 @@ export default function ReservationForm() {
 
 				<div className="flex space-x-2 justify-center">
 					<button
-						className="btn bg-purple-500 md:w-1/3 w-full text-lg h-16 text-white hover:bg-purple-400"
+						className="btn bg-blue-500 md:w-1/3 w-full text-lg h-16 text-white hover:bg-blue-600"
 						type="submit"
 					>
 						Add Reservation

@@ -66,7 +66,7 @@ function Users() {
 					<table className="table mt-4">
 						{/* head */}
 						<thead>
-							<tr className="bg-slate-700 text-white text-lg">
+							<tr className="bg-gray-600 text-white text-lg">
 								<th>Name</th>
 								<th>Email</th>
 								<th>User</th>
