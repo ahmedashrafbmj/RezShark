@@ -515,11 +515,12 @@ export default function ReservationForm() {
 
 									if (course != null) {
 										setSelectCourses(course);
-										setCourseIds(
-											course.courses.map(
-												(c) => c.course_id
-											)
-										);
+										setCourseIds([]);
+										// setCourseIds(
+										// 	course.courses.map(
+										// 		(c) => c.course_id
+										// 	)
+										// );
 									}
 								}}
 							>
