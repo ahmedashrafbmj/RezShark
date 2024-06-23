@@ -124,6 +124,15 @@ export default function Home() {
 									"Login"
 								)}
 							</button>
+							<button
+								className="btn btn-primary  w-full mt-4 hover:bg-black hover:text-white"
+								onClick={() => {
+									router.push("/register");
+								}}
+								type="button"
+							>
+								Sign Up
+							</button>
 						</form>
 					</div>
 				</div>

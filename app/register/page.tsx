@@ -11,6 +11,8 @@ import { withAuth } from "@/components/withAuth";
 import Loading from "@/components/loading";
 
 const Signup = () => {
+	const router = useRouter();
+
 	const [isLoading, setIsLoading] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -44,8 +46,8 @@ const Signup = () => {
 				isAdmin: false,
 			});
 
-			reset();
-			toast.success("User Added Successfully");
+			toast.success("Registered Successfully");
+			router.back();
 		} catch (error: unknown) {
 			if (error instanceof AxiosError) {
 				toast.error(error.response?.data?.detail);
@@ -55,22 +57,11 @@ const Signup = () => {
 		}
 	};
 
-	const reset = () => {
-		setEmail("");
-		setPassword("");
-		setFirstName("");
-		setLastName("");
-		setNickname("");
-		setBirthday("");
-		setCity("");
-		setState("");
-	};
-
 	return isLoading ? (
 		<Loading />
 	) : (
 		<div className="flex-col">
-			<Header title="Add New User" showBack />
+			<Header title="Register" showBack />
 
 			<main className="flex overflow-y-scroll bg-slate-100 h-[calc(100vh-6rem)] items-center justify-center">
 				<div className=" mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-[80%] p-8 md:mt-0 mt-24 w-full">
@@ -249,4 +240,4 @@ const Signup = () => {
 	);
 };
 
-export default withAuth(Signup);
+export default Signup;

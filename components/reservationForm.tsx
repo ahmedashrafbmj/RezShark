@@ -21,14 +21,6 @@ type error = {
 	courses?: string;
 };
 
-type selectedCourses = {
-	black: boolean;
-	blue: boolean;
-	red: boolean;
-	green: boolean;
-	yellow: boolean;
-};
-
 type queryType = {
 	id: string;
 	resName: string;
@@ -39,6 +31,8 @@ type queryType = {
 	confirmationEmail: string;
 	ccEmails: string[];
 	selectCourses: number[];
+	selectCoursesNames: string[];
+	selectCoursesUrl: string;
 	gameDate: string;
 	type: string;
 	status: boolean;
@@ -48,12 +42,29 @@ type queryType = {
 	playerCount: number;
 };
 
+type inCoursesType = {
+	course_id: number;
+	course_name: string;
+};
+
+type coursesType = {
+	website_path: string;
+	course_title: string;
+	location: string;
+	courses: inCoursesType[];
+	holes: string;
+};
+
 export default function ReservationForm() {
 	const userData = useUserStore((state) => state.user);
 
 	const router = useRouter();
 
 	const [isLoading, setIsLoading] = useState(false);
+
+	const [coursesData, setCoursesData] = useState<coursesType[]>([]);
+	const [selectCourse, setSelectCourses] = useState<coursesType | null>(null);
+	const [courseIds, setCourseIds] = useState<number[]>([]);
 
 	const [resData, setResData] = useState<queryType[]>([]);
 	const [showDropdown, setShowDropdown] = useState(false);
@@ -69,22 +80,19 @@ export default function ReservationForm() {
 	const [confirmationEmail, setConfirmationEmail] = useState("");
 	const [ccEmails, setCcEmails] = useState("");
 	const [hideInBackground, setHideInBackground] = useState(true);
-	const [selectedCourses, setSelectedCourses] = useState<selectedCourses>({
-		black: false,
-		blue: false,
-		green: false,
-		red: false,
-		yellow: false,
-	});
 
 	const [errors, setErrors] = useState<error>({});
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, checked } = e.target;
-		setSelectedCourses({
-			...selectedCourses,
-			[name]: checked,
-		});
+		const { value } = e.target;
+		if (courseIds.includes(Number(value))) {
+			let crsIds = courseIds.filter((c) => c != Number(value));
+
+			setCourseIds(crsIds);
+		} else {
+			let crsIds = [...courseIds, Number(value)];
+			setCourseIds(crsIds);
+		}
 	};
 
 	const resetStates = () => {
@@ -99,13 +107,8 @@ export default function ReservationForm() {
 		setConfirmationEmail("");
 		setCcEmails("");
 		setHideInBackground(true);
-		setSelectedCourses({
-			black: false,
-			blue: false,
-			green: false,
-			red: false,
-			yellow: false,
-		});
+		setSelectCourses(null);
+		setCourseIds([]);
 	};
 
 	const validateEmail = (email: string) => {
@@ -139,8 +142,7 @@ export default function ReservationForm() {
 		} else if (!validateEmail(confirmationEmail)) {
 			newErrors.confirmationEmail = "Invalid email format";
 		}
-		const atLeastOneCourseSelected =
-			Object.values(selectedCourses).some(Boolean);
+		const atLeastOneCourseSelected = courseIds.length > 0;
 		if (!atLeastOneCourseSelected)
 			newErrors.courses = "At least one course must be selected";
 
@@ -152,10 +154,6 @@ export default function ReservationForm() {
 			setIsLoading(true);
 			try {
 				// If no errors, submit the form data
-				// ['black', 'blue', 'green', 'red', 'yellow']
-				let selectCourses = Object.values(selectedCourses).map(
-					(course) => Number(course)
-				);
 
 				// console.log("Form submitted:", {
 				// 	email,
@@ -186,7 +184,17 @@ export default function ReservationForm() {
 						? ccEmails.split("\n").join(",").split(",")
 						: ccEmails.split(",") ?? [""],
 					hideInBackground,
-					selectCourses,
+					selectCourses: courseIds,
+					selectCoursesNames: selectCourse?.courses
+						.map((c) => {
+							if (courseIds.includes(c.course_id)) {
+								return c.course_name.trim();
+							}
+
+							return null;
+						})
+						.filter(Boolean),
+					selectCoursesUrl: selectCourse?.website_path,
 					dateOpened: new Date().toLocaleString("en-US"),
 				});
 
@@ -216,6 +224,19 @@ export default function ReservationForm() {
 		} catch (error) {
 			console.log("ERROR", error);
 			setResData([]);
+		}
+	};
+
+	const getCoursesData = async () => {
+		try {
+			let response = await axios.get(`${API_URL}/getCourses`);
+
+			if (response.data?.length > 0) {
+				setCoursesData(response.data);
+			}
+		} catch (error) {
+			console.log("ERROR", error);
+			setCoursesData([]);
 		} finally {
 			setIsLoading(false);
 		}
@@ -233,38 +254,26 @@ export default function ReservationForm() {
 		setConfirmationEmail(data.confirmationEmail);
 		setCcEmails(data.ccEmails.toString());
 
-		const coursesMapping = {
-			0: "black",
-			1: "blue",
-			2: "green",
-			3: "red",
-			4: "yellow",
-		};
+		let courses: coursesType = {} as coursesType;
+		coursesData?.forEach((c) => {
+			let idx = c.courses.findIndex(
+				(cc) => cc.course_id === data.selectCourses[0]
+			);
 
-		const newSelectedCourses: selectedCourses = {
-			black: false,
-			blue: false,
-			green: false,
-			red: false,
-			yellow: false,
-		};
-
-		data.selectCourses.forEach((course, index) => {
-			const courseName = coursesMapping[
-				index as keyof typeof coursesMapping
-			] as keyof selectedCourses;
-			if (courseName) {
-				newSelectedCourses[courseName] = course === 1;
+			if (idx != -1) {
+				courses = c;
+				return;
 			}
 		});
-
-		setSelectedCourses(newSelectedCourses);
+		setSelectCourses(courses);
+		setCourseIds(data.selectCourses);
 
 		setShowDropdown(false);
 	};
 
 	useEffect(() => {
 		getQueriesData();
+		getCoursesData();
 	}, []);
 
 	return isLoading ? (
@@ -495,28 +504,67 @@ export default function ReservationForm() {
 						<span className="label-text text-lg font-bold">
 							Select Courses to Search
 						</span>
-						<div className="grid grid-cols-1 lg:grid-cols-2 mt-4  gap-y-1 md:gap-y-0 gap-x-0 md:gap-x-8">
-							{Object.keys(selectedCourses).map((course) => (
-								<div className="form-control" key={course}>
-									<label className="cursor-pointer label">
-										<span className="label-text text-lg">
-											{course.charAt(0).toUpperCase() +
-												course.slice(1)}
-										</span>
-										<input
-											type="checkbox"
-											name={course}
-											className="checkbox checkbox-success checkbox-md custom-checkbox"
-											checked={
-												selectedCourses[
-													course as keyof selectedCourses
-												]
-											}
-											onChange={handleCheckboxChange}
-										/>
-									</label>
-								</div>
-							))}
+						<div className="w-full text-black mt-6">
+							<select
+								className="select select-primary w-full  bg-white"
+								value={selectCourse?.website_path}
+								onChange={(e) => {
+									let course = coursesData.find(
+										(c) => c.website_path == e.target.value
+									);
+
+									if (course != null) {
+										setSelectCourses(course);
+										setCourseIds(
+											course.courses.map(
+												(c) => c.course_id
+											)
+										);
+									}
+								}}
+							>
+								<option disabled selected>
+									Choose Your Course
+								</option>
+								{coursesData?.map((c) => (
+									<option
+										key={c.website_path}
+										value={c.website_path}
+									>
+										{c.course_title}
+									</option>
+								))}
+							</select>
+						</div>
+						<div className="grid grid-cols-1 lg:grid-cols-2 mt-4  gap-y-1 md:gap-y-0 gap-x-0 md:gap-x-8 items-center">
+							{selectCourse?.courses.map((course) => {
+								if (course.course_name != "") {
+									return (
+										<div
+											className="form-control"
+											key={course.course_id}
+										>
+											<label className="cursor-pointer label">
+												<span className="label-text text-lg text-left mr-4">
+													{course.course_name}
+												</span>
+												<input
+													type="checkbox"
+													name={course.course_name}
+													value={course.course_id}
+													className="checkbox checkbox-success checkbox-md custom-checkbox"
+													checked={courseIds?.includes(
+														course.course_id
+													)}
+													onChange={
+														handleCheckboxChange
+													}
+												/>
+											</label>
+										</div>
+									);
+								}
+							})}
 						</div>
 						{errors.courses && (
 							<p className="text-red-500  mt-2 text-center">

@@ -64,6 +64,7 @@ const Sidebar = () => {
 							Make Reservation
 						</li>
 					</Link>
+
 					{userData?.isAdmin ? (
 						<Link
 							href="/signup"
