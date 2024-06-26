@@ -152,7 +152,7 @@ const ListPage: NextPage<Props> = ({}) => {
 			<Header title={`Welcome, ${userData?.username ?? ""}`} />
 
 			<div className="flex-col mx-16 space-y-6">
-				<div className="md:flex md:space-x-4 mb-8">
+				{/* <div className="md:flex md:space-x-4 mb-8">
 					<div className="flex-1 flex h-20 bg-blue-500 mt-8 justify-center items-center">
 						<span className="text-xl text-white font-bold">
 							Entertainment
@@ -168,7 +168,7 @@ const ListPage: NextPage<Props> = ({}) => {
 							Dining
 						</span>
 					</div>
-				</div>
+				</div> */}
 
 				{tableLoading ? (
 					<div className="flex justify-center items-center">
