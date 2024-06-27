@@ -149,7 +149,7 @@ const ListPage: NextPage<Props> = ({}) => {
 		<Loading />
 	) : (
 		<div className="flex-col ">
-			<Header title={`Welcome, ${userData?.username ?? ""}`} />
+			<Header title={`Welcome, ${userData?.first_name ?? ""}`} />
 
 			<div className="flex-col mx-16 space-y-6">
 				<div
