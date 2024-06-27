@@ -4,7 +4,13 @@ import { persist, createJSONStorage } from "zustand/middleware";
 type user = {
 	id: string;
 	isAdmin: boolean;
-	username: String;
+	email: string;
+	first_name: string;
+	last_name: string;
+	nickname: string;
+	birthday: string;
+	city: string;
+	state: string;
 };
 
 interface UserState {

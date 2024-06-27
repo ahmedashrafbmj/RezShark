@@ -152,24 +152,13 @@ const ListPage: NextPage<Props> = ({}) => {
 			<Header title={`Welcome, ${userData?.username ?? ""}`} />
 
 			<div className="flex-col mx-16 space-y-6">
-				<div className="md:flex md:space-x-4 mb-8">
-					<div className="flex-1 flex h-20 bg-blue-500 mt-8 justify-center items-center">
-						<span className="text-xl text-white font-bold">
-							Entertainment
-						</span>
-					</div>
-					<div className="flex-1 flex h-20 bg-gray-600 mt-8 justify-center items-center">
-						<span className="text-xl text-white font-bold">
-							Travel
-						</span>
-					</div>
-					<div className="flex-1 flex h-20 bg-blue-500 mt-8 justify-center items-center">
-						<span className="text-xl text-white font-bold">
-							Dining
-						</span>
-					</div>
-				</div>
-
+				<div
+					className="min-h-40 mt-4 bg-cover"
+					style={{
+						backgroundImage:
+							"url('https://images.unsplash.com/photo-1513116917658-bdc8f9e49348?q=80&w=2070&auto=format&fit=crop')",
+					}}
+				></div>
 				{tableLoading ? (
 					<div className="flex justify-center items-center">
 						<span className="loading loading-spinner text-primary w-6 h-6"></span>
@@ -184,6 +173,7 @@ const ListPage: NextPage<Props> = ({}) => {
 							<thead>
 								<tr className="bg-gray-600 text-white text-lg">
 									<th>Request Number</th>
+									<th>Reservation Type</th>
 									<th>Reservation Name</th>
 									<th>Date Opened</th>
 									<th>Status</th>
@@ -197,6 +187,11 @@ const ListPage: NextPage<Props> = ({}) => {
 										<td>
 											<span className="text-base">
 												{data.id}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												Golf
 											</span>
 										</td>
 										<td>
@@ -255,6 +250,7 @@ const ListPage: NextPage<Props> = ({}) => {
 							<thead>
 								<tr className="bg-gray-600 text-white text-lg">
 									<th>Request Number</th>
+									<th>Reservation Type</th>
 									<th>Reservation Name</th>
 									<th>Date Opened</th>
 									<th>Status</th>
@@ -269,6 +265,11 @@ const ListPage: NextPage<Props> = ({}) => {
 										<td>
 											<span className="text-base">
 												{data.id}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
+												Golf
 											</span>
 										</td>
 										<td>
