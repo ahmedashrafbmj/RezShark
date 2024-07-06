@@ -23,6 +23,7 @@ type queryType = {
 	userId: string;
 	earliestTime: string;
 	gameDate: string;
+	requestType: string;
 	latestTime: string;
 	playerCount: number;
 };
@@ -66,6 +67,8 @@ const ListPage: NextPage<Props> = ({}) => {
 
 			if (response.data?.length > 0) {
 				setQueryStates(response.data);
+			} else {
+				setQueryStates([]);
 			}
 		} catch (error) {
 			console.log("ERROR", error);
@@ -252,6 +255,7 @@ const ListPage: NextPage<Props> = ({}) => {
 									<th>Request Number</th>
 									<th>Reservation Type</th>
 									<th>Reservation Name</th>
+									<th>Request Type</th>
 									<th>Date Opened</th>
 									<th>Status</th>
 									<th>Start / Stop</th>
@@ -279,24 +283,31 @@ const ListPage: NextPage<Props> = ({}) => {
 										</td>
 										<td>
 											<span className="text-base">
+												{data.requestType}
+											</span>
+										</td>
+										<td>
+											<span className="text-base">
 												{data.dateOpened}
 											</span>
 										</td>
 										<td>{data.type}</td>
 										<td>
-											<button
-												className="btn btn-primary hover:bg-slate-800 hover:text-white"
-												onClick={() =>
-													handleUpdateStatus(
-														data.id,
-														data.status
-													)
-												}
-											>
-												{data.status
-													? "Stop Service"
-													: "Start Service"}
-											</button>
+											{data.requestType == "Standard" ? (
+												<button
+													className="btn btn-primary hover:bg-slate-800 hover:text-white"
+													onClick={() =>
+														handleUpdateStatus(
+															data.id,
+															data.status
+														)
+													}
+												>
+													{data.status
+														? "Stop Service"
+														: "Start Service"}
+												</button>
+											) : null}
 										</td>
 										<td>
 											<button

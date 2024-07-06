@@ -19,11 +19,13 @@ type error = {
 	ccEmails?: string;
 	hideInBackground?: string;
 	courses?: string;
+	requestType?: string;
 };
 
 type queryType = {
 	id: string;
 	resName: string;
+	requestType: string;
 	name: string;
 	email: string;
 	password: string;
@@ -68,7 +70,9 @@ export default function ReservationForm() {
 
 	const [resData, setResData] = useState<queryType[]>([]);
 	const [showDropdown, setShowDropdown] = useState(false);
+	const [reqDropdown, setReqDropdown] = useState(false);
 
+	const [requestType, setRequestType] = useState("");
 	const [resName, setResName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -96,6 +100,7 @@ export default function ReservationForm() {
 	};
 
 	const resetStates = () => {
+		setRequestType("");
 		setResName("");
 		setEmail("");
 		setPassword("");
@@ -128,6 +133,8 @@ export default function ReservationForm() {
 		} else if (!validateEmail(email)) {
 			newErrors.email = "Invalid email format";
 		}
+		if (!requestType.trim())
+			newErrors.requestType = "Request Type is required";
 		if (!password.trim()) newErrors.password = "Password is required";
 		if (!gameDate.trim()) newErrors.gameDate = "Game date is required";
 		if (!earliestTime.trim())
@@ -196,6 +203,7 @@ export default function ReservationForm() {
 						.filter(Boolean),
 					selectCoursesUrl: selectCourse?.website_path,
 					dateOpened: new Date().toLocaleString("en-US"),
+					requestType,
 				});
 
 				resetStates();
@@ -243,6 +251,8 @@ export default function ReservationForm() {
 	};
 
 	const onAutoFillSelect = (data: queryType) => {
+		setRequestType(data.requestType);
+		setResName(data.resName);
 		setResName(data.resName);
 		setEmail(data.email);
 		setPassword(data.password);
@@ -307,6 +317,45 @@ export default function ReservationForm() {
 							))}
 						</ul>
 					</div>
+				</div>
+
+				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
+					<div className="dropdown dropdown-bottom w-full">
+						<div
+							tabIndex={0}
+							role="button"
+							className="btn m-1 bg-blue-500 hover:bg-blue-600 text-white w-full  text-lg"
+							onClick={() => setReqDropdown((p) => !p)}
+						>
+							{requestType != ""
+								? `${requestType} Request`
+								: "Choose Request Type"}
+						</div>
+						<ul
+							tabIndex={0}
+							hidden={!reqDropdown}
+							className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
+						>
+							{["Standard", "Time"]?.map((data, i) => (
+								<li
+									key={i}
+									className="py-2 hover:bg-slate-300 hover:cursor-pointer"
+									onClick={() => {
+										setRequestType(data);
+										setReqDropdown(false);
+									}}
+								>
+									{data} Request
+								</li>
+							))}
+						</ul>
+					</div>
+
+					{errors.requestType && (
+						<p className="text-red-500 mt-2">
+							{errors.requestType}
+						</p>
+					)}
 				</div>
 
 				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
