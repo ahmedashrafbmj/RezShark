@@ -20,6 +20,8 @@ type error = {
 	hideInBackground?: string;
 	courses?: string;
 	requestType?: string;
+	scriptDate?: string;
+	scriptTime?: string;
 };
 
 type queryType = {
@@ -42,6 +44,8 @@ type queryType = {
 	earliestTime: string;
 	latestTime: string;
 	playerCount: number;
+	scriptDate: string;
+	scriptTime: string;
 };
 
 type inCoursesType = {
@@ -72,6 +76,9 @@ export default function ReservationForm() {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [reqDropdown, setReqDropdown] = useState(false);
 
+	const [scriptDate, setScriptDate] = useState("");
+	const [scriptTime, setScriptTime] = useState("");
+
 	const [requestType, setRequestType] = useState("");
 	const [resName, setResName] = useState("");
 	const [email, setEmail] = useState("");
@@ -100,6 +107,8 @@ export default function ReservationForm() {
 	};
 
 	const resetStates = () => {
+		setScriptDate("");
+		setScriptTime("");
 		setRequestType("");
 		setResName("");
 		setEmail("");
@@ -133,6 +142,14 @@ export default function ReservationForm() {
 		} else if (!validateEmail(email)) {
 			newErrors.email = "Invalid email format";
 		}
+
+		if (requestType == "Time") {
+			if (!scriptDate.trim())
+				newErrors.scriptDate = "Script date is required";
+			if (!scriptTime.trim())
+				newErrors.scriptTime = "Script time is required";
+		}
+
 		if (!requestType.trim())
 			newErrors.requestType = "Request Type is required";
 		if (!password.trim()) newErrors.password = "Password is required";
@@ -204,6 +221,8 @@ export default function ReservationForm() {
 					selectCoursesUrl: selectCourse?.website_path,
 					dateOpened: new Date().toLocaleString("en-US"),
 					requestType,
+					scriptDate,
+					scriptTime,
 				});
 
 				resetStates();
@@ -358,6 +377,58 @@ export default function ReservationForm() {
 					)}
 				</div>
 
+				{requestType == "Time" && (
+					<div className="md:flex justify-between mt-4 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
+						<div className="flex-col w-full">
+							<div className="label mt-1">
+								<span className="label-text">
+									Script Run Date
+								</span>
+							</div>
+							<label className="input input-bordered flex items-center gap-2">
+								<input
+									type="date"
+									className="grow"
+									placeholder="Run Date"
+									value={scriptDate}
+									onChange={(e) => {
+										setScriptDate(e.target.value);
+										setGameDate("");
+									}}
+								/>
+							</label>
+							{errors.scriptDate && (
+								<p className="text-red-500 mt-2">
+									{errors.scriptDate}
+								</p>
+							)}
+						</div>
+						<div className="flex-col w-full">
+							<div className="label mt-1">
+								<span className="label-text">
+									Script Run Time
+								</span>
+							</div>
+							<label className="input input-bordered flex items-center gap-2">
+								<input
+									type="time"
+									className="grow"
+									placeholder="Run Time"
+									value={scriptTime}
+									onChange={(e) =>
+										setScriptTime(e.target.value)
+									}
+								/>
+							</label>
+							{errors.scriptTime && (
+								<p className="text-red-500 mt-2">
+									{errors.scriptTime}
+								</p>
+							)}
+						</div>
+					</div>
+				)}
+
 				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
 					<div className="label mt-1">
 						<span className="label-text">Reservation Name</span>
@@ -451,6 +522,7 @@ export default function ReservationForm() {
 									type="date"
 									className="grow"
 									placeholder="Game Date"
+									min={scriptDate}
 									value={gameDate}
 									onChange={(e) =>
 										setGameDate(e.target.value)

@@ -26,6 +26,8 @@ type queryType = {
 	requestType: string;
 	latestTime: string;
 	playerCount: number;
+	scriptDate: string;
+	scriptTime: string;
 };
 
 const ListPage: NextPage<Props> = ({}) => {
@@ -410,6 +412,24 @@ const ListPage: NextPage<Props> = ({}) => {
 										Player Count
 									</td>
 									<td>{currentData?.playerCount}</td>
+								</tr>
+								<tr>
+									<td className="border-r-2 text-lg font-bold">
+										Request Type
+									</td>
+									<td>{currentData?.requestType}</td>
+								</tr>
+								<tr>
+									<td className="border-r-2 text-lg font-bold">
+										Run Date
+									</td>
+									<td>{currentData?.scriptDate}</td>
+								</tr>
+								<tr>
+									<td className="border-r-2 text-lg font-bold">
+										Run Time
+									</td>
+									<td>{currentData?.scriptTime}</td>
 								</tr>
 							</tbody>
 						</table>
