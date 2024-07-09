@@ -130,6 +130,22 @@ export default function ReservationForm() {
 		return emailPattern.test(email);
 	};
 
+	const convertToUTC = () => {
+		const [hours, minutes] = scriptTime.split(":");
+		const date = new Date();
+		date.setHours(Number(hours));
+		date.setMinutes(Number(minutes));
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+
+		const utcHours = date.getUTCHours().toString().padStart(2, "0");
+		const utcMinutes = date.getUTCMinutes().toString().padStart(2, "0");
+
+		let finalTime = `${utcHours}:${utcMinutes}`;
+
+		return finalTime;
+	};
+
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		const newErrors: error = {};
@@ -222,7 +238,7 @@ export default function ReservationForm() {
 					dateOpened: new Date().toLocaleString("en-US"),
 					requestType,
 					scriptDate,
-					scriptTime,
+					scriptTime: convertToUTC(),
 				});
 
 				resetStates();

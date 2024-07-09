@@ -127,6 +127,19 @@ const ListPage: NextPage<Props> = ({}) => {
 		}
 	};
 
+	const convertToLocalTime = (utcTime?: string) => {
+		if (!utcTime) return "";
+		const [hours, minutes] = utcTime.split(":");
+		const date = new Date(
+			Date.UTC(1970, 0, 1, Number(hours), Number(minutes))
+		);
+
+		const localHours = date.getHours().toString().padStart(2, "0");
+		const localMinutes = date.getMinutes().toString().padStart(2, "0");
+
+		return `${localHours}:${localMinutes}`;
+	};
+
 	useEffect(() => {
 		getQueriesData();
 	}, []);
@@ -429,7 +442,11 @@ const ListPage: NextPage<Props> = ({}) => {
 									<td className="border-r-2 text-lg font-bold">
 										Run Time
 									</td>
-									<td>{currentData?.scriptTime}</td>
+									<td>
+										{convertToLocalTime(
+											currentData?.scriptTime
+										)}
+									</td>
 								</tr>
 							</tbody>
 						</table>
