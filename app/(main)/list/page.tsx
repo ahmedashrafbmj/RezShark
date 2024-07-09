@@ -434,13 +434,13 @@ const ListPage: NextPage<Props> = ({}) => {
 								</tr>
 								<tr>
 									<td className="border-r-2 text-lg font-bold">
-										Run Date
+										Tool Date
 									</td>
 									<td>{currentData?.scriptDate}</td>
 								</tr>
 								<tr>
 									<td className="border-r-2 text-lg font-bold">
-										Run Time
+										Tool Time
 									</td>
 									<td>
 										{convertToLocalTime(

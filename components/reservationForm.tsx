@@ -161,9 +161,9 @@ export default function ReservationForm() {
 
 		if (requestType == "Time") {
 			if (!scriptDate.trim())
-				newErrors.scriptDate = "Script date is required";
+				newErrors.scriptDate = "Tool date is required";
 			if (!scriptTime.trim())
-				newErrors.scriptTime = "Script time is required";
+				newErrors.scriptTime = "Tool time is required";
 		}
 
 		if (!requestType.trim())
@@ -398,14 +398,14 @@ export default function ReservationForm() {
 						<div className="flex-col w-full">
 							<div className="label mt-1">
 								<span className="label-text">
-									Script Run Date
+									Tool Run Date
 								</span>
 							</div>
 							<label className="input input-bordered flex items-center gap-2">
 								<input
 									type="date"
 									className="grow"
-									placeholder="Run Date"
+									placeholder="Tool Date"
 									value={scriptDate}
 									onChange={(e) => {
 										setScriptDate(e.target.value);
@@ -422,14 +422,14 @@ export default function ReservationForm() {
 						<div className="flex-col w-full">
 							<div className="label mt-1">
 								<span className="label-text">
-									Script Run Time
+									Tool Run Time
 								</span>
 							</div>
 							<label className="input input-bordered flex items-center gap-2">
 								<input
 									type="time"
 									className="grow"
-									placeholder="Run Time"
+									placeholder="Tool Time"
 									value={scriptTime}
 									onChange={(e) =>
 										setScriptTime(e.target.value)
