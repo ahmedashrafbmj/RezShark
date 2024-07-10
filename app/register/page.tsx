@@ -22,6 +22,7 @@ const Signup = () => {
 	const [birthday, setBirthday] = useState("");
 	const [city, setCity] = useState("");
 	const [state, setState] = useState("");
+	const [code, setCode] = useState("");
 
 	const onSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -32,6 +33,12 @@ const Signup = () => {
 				toast.error("Email, password, and names are required");
 				return;
 			}
+
+			if (code == "" || code != "EARLY") {
+				toast.error("Invalid code");
+				return;
+			}
+
 			setIsLoading(true);
 
 			let response = await axios.post(`${API_URL}/signup`, {
@@ -63,7 +70,7 @@ const Signup = () => {
 		<div className="flex-col">
 			<Header title="Register" showBack />
 
-			<main className="flex overflow-y-scroll bg-slate-100 h-[calc(100vh-6rem)] items-center justify-center">
+			<main className="flex overflow-y-scroll bg-slate-100 h-full items-center justify-center">
 				<div className=" mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-[80%] p-8 md:mt-0 mt-24 w-full">
 					<div className="md:flex md:items-center">
 						<div className="md:shrink-0 w-full md:w-60">
@@ -219,6 +226,22 @@ const Signup = () => {
 											value={state}
 											onChange={(e) =>
 												setState(e.target.value)
+											}
+										/>
+									</label>
+								</div>
+								<div className="col-span-2">
+									<div className="label mt-4">
+										<span className="label-text">Code</span>
+									</div>
+									<label className="input input-bordered flex items-center gap-2">
+										<input
+											type="text"
+											className="grow"
+											placeholder="Code"
+											value={code}
+											onChange={(e) =>
+												setCode(e.target.value)
 											}
 										/>
 									</label>
