@@ -96,6 +96,7 @@ export default function ReservationForm() {
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target;
+
 		if (courseIds.includes(Number(value))) {
 			let crsIds = courseIds.filter((c) => c != Number(value));
 
@@ -224,7 +225,15 @@ export default function ReservationForm() {
 						? ccEmails.split("\n").join(",").split(",")
 						: ccEmails.split(",") ?? [""],
 					hideInBackground,
-					selectCourses: courseIds,
+					selectCourses: selectCourse?.courses
+						.map((c) => {
+							if (courseIds.includes(c.course_id)) {
+								return c.course_id;
+							}
+
+							return null;
+						})
+						.filter(Boolean),
 					selectCoursesNames: selectCourse?.courses
 						.map((c) => {
 							if (courseIds.includes(c.course_id)) {
