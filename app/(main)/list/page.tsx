@@ -23,6 +23,7 @@ type queryType = {
 	userId: string;
 	earliestTime: string;
 	gameDate: string;
+	booking_class: string;
 	requestType: string;
 	latestTime: string;
 	playerCount: number;
@@ -437,6 +438,12 @@ const ListPage: NextPage<Props> = ({}) => {
 										Tool Date
 									</td>
 									<td>{currentData?.scriptDate}</td>
+								</tr>
+								<tr>
+									<td className="border-r-2 text-lg font-bold">
+										Booking Class
+									</td>
+									<td>{currentData?.booking_class}</td>
 								</tr>
 								<tr>
 									<td className="border-r-2 text-lg font-bold">

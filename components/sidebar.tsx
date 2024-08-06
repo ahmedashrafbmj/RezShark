@@ -147,7 +147,7 @@ const Sidebar = () => {
 										</Link>
 									)}
 								</div>
-								<Link href={"/"}>
+								<Link href={"#"}>
 									<li
 										className={`p-6  hover:bg-blue-700 font-bold ${
 											currentPage == "/travel"

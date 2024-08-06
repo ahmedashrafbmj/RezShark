@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { API_URL } from "@/utils/constants";
 import { useRouter } from "next/navigation";
@@ -10,11 +10,21 @@ import { toast } from "react-toastify";
 export default function Home() {
 	const router = useRouter();
 
+	const [pageLoading, setPageLoading] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+	const user = useUserStore((state) => state.user);
 	const setUser = useUserStore((state) => state.save);
+
+	useEffect(() => {
+		if (user != null) {
+			router.replace("/list");
+		}
+
+		setPageLoading(false);
+	}, [user]);
 
 	const onSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -45,7 +55,11 @@ export default function Home() {
 		}
 	};
 
-	return (
+	return pageLoading ? (
+		<div className="flex flex-col h-[100vh] items-center justify-center">
+			<span className="loading loading-spinner text-blue-500 size-10"></span>
+		</div>
+	) : (
 		<main className="flex bg-slate-100 min-h-screen items-center justify-center">
 			<div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8">
 				<div className="md:flex md:items-center">

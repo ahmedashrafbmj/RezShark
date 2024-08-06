@@ -1,4 +1,4 @@
-import { API_URL } from "@/utils/constants";
+import { API_URL, BOOKING_CLASS_DATA } from "@/utils/constants";
 import { useUserStore } from "@/utils/store";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,7 @@ type error = {
 	requestType?: string;
 	scriptDate?: string;
 	scriptTime?: string;
+	bookingClass?: string;
 };
 
 type queryType = {
@@ -46,6 +47,7 @@ type queryType = {
 	playerCount: number;
 	scriptDate: string;
 	scriptTime: string;
+	bookingClass: string;
 };
 
 type inCoursesType = {
@@ -84,6 +86,7 @@ export default function ReservationForm() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [gameDate, setGameDate] = useState("");
+	const [bookingClass, setBookingClass] = useState("2140");
 	const [earliestTime, setEarliestTime] = useState("");
 	const [latestTime, setLatestTime] = useState("");
 	const [playerCount, setPlayerCount] = useState("");
@@ -115,6 +118,7 @@ export default function ReservationForm() {
 		setEmail("");
 		setPassword("");
 		setGameDate("");
+		setBookingClass("");
 		setEarliestTime("");
 		setLatestTime("");
 		setPlayerCount("");
@@ -152,7 +156,7 @@ export default function ReservationForm() {
 		const newErrors: error = {};
 
 		// Validate required fields
-		if (!resName.trim()) newErrors.resName = "Rservation Name is required";
+		if (!resName.trim()) newErrors.resName = "Reservation Name is required";
 
 		if (!email.trim() && !validateEmail(email)) {
 			newErrors.email = "Email is required";
@@ -171,6 +175,8 @@ export default function ReservationForm() {
 			newErrors.requestType = "Request Type is required";
 		if (!password.trim()) newErrors.password = "Password is required";
 		if (!gameDate.trim()) newErrors.gameDate = "Game date is required";
+		if (!bookingClass.trim())
+			newErrors.bookingClass = "Booking Type is required";
 		if (!earliestTime.trim())
 			newErrors.earliestTime = "Earliest time is required";
 		if (!latestTime.trim())
@@ -220,6 +226,7 @@ export default function ReservationForm() {
 					latestTime,
 					playerCount,
 					name,
+					booking_class: bookingClass,
 					confirmationEmail,
 					ccEmails: ccEmails.includes("\n")
 						? ccEmails.split("\n").join(",").split(",")
@@ -307,6 +314,7 @@ export default function ReservationForm() {
 		setName(data.name);
 		setConfirmationEmail(data.confirmationEmail);
 		setCcEmails(data.ccEmails.toString());
+		setBookingClass(data.bookingClass);
 
 		let courses: coursesType = {} as coursesType;
 		coursesData?.forEach((c) => {
@@ -333,147 +341,178 @@ export default function ReservationForm() {
 	return isLoading ? (
 		<Loading />
 	) : (
-		<div className="flex-col justify-start text-center items-center px-6 py-8 bg-white">
-			<form className="space-y-8" onSubmit={handleSubmit}>
+		<div>
+			<form
+				onSubmit={handleSubmit}
+				className="flex-col justify-start text-center items-center px-4 py-8 bg-white"
+			>
+				<h2 className="text-xl font-bold text-start mb-2">
+					Pre-Load Reservation
+				</h2>
 				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
-					<div className="dropdown dropdown-bottom w-full">
-						<div
-							tabIndex={0}
-							role="button"
-							className="btn m-1 bg-blue-500 hover:bg-blue-600 text-white w-full  text-lg"
-							onClick={() => setShowDropdown((p) => !p)}
-						>
-							Auto Fill Reservation
+					<div>
+						<div className="dropdown dropdown-bottom w-full">
+							<div
+								tabIndex={0}
+								role="button"
+								className="btn m-1 bg-blue-500 hover:bg-blue-600 text-white w-full  text-lg"
+								onClick={() => setShowDropdown((p) => !p)}
+							>
+								Auto Fill Reservation
+							</div>
+							<ul
+								tabIndex={0}
+								hidden={!showDropdown}
+								className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
+							>
+								{resData?.map((data) => (
+									<li
+										key={data.id}
+										className="py-2 hover:bg-slate-300 hover:cursor-pointer"
+										onClick={() => onAutoFillSelect(data)}
+									>
+										{data.resName}
+									</li>
+								))}
+							</ul>
 						</div>
-						<ul
-							tabIndex={0}
-							hidden={!showDropdown}
-							className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
-						>
-							{resData?.map((data) => (
-								<li
-									key={data.id}
-									className="py-2 hover:bg-slate-300 hover:cursor-pointer"
-									onClick={() => onAutoFillSelect(data)}
-								>
-									{data.resName}
-								</li>
-							))}
-						</ul>
 					</div>
 				</div>
 
-				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
-					<div className="dropdown dropdown-bottom w-full">
-						<div
-							tabIndex={0}
-							role="button"
-							className="btn m-1 bg-blue-500 hover:bg-blue-600 text-white w-full  text-lg"
-							onClick={() => setReqDropdown((p) => !p)}
-						>
-							{requestType != ""
-								? `${requestType} Request`
-								: "Choose Request Type"}
+				<div className="h-8" />
+				<h2 className="text-xl font-bold text-start mb-2">
+					Reservation Creation
+				</h2>
+				<div className="grid md:grid-cols-2 grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4 px-6 pb-4 pt-2 bg-gray-700  rounded-xl">
+					<div className=" text-white flex-col w-full rounded-xl">
+						<div className="label mt-1">
+							<span className="label-text">Reservation Name</span>
 						</div>
-						<ul
-							tabIndex={0}
-							hidden={!reqDropdown}
-							className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
-						>
-							{["Standard", "Time"]?.map((data, i) => (
-								<li
-									key={i}
-									className="py-2 hover:bg-slate-300 hover:cursor-pointer"
-									onClick={() => {
-										setRequestType(data);
-										setReqDropdown(false);
-									}}
-								>
-									{data} Request
-								</li>
-							))}
-						</ul>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="text"
+								className="grow"
+								placeholder="Reservation Name"
+								value={resName}
+								onChange={(e) => setResName(e.target.value)}
+							/>
+						</label>
+						{errors.resName && (
+							<p className="text-red-500 mt-2">
+								{errors.resName}
+							</p>
+						)}
 					</div>
 
-					{errors.requestType && (
-						<p className="text-red-500 mt-2">
-							{errors.requestType}
-						</p>
-					)}
+					<div className=" text-white flex-col rounded-xl">
+						<div className="label mt-1">
+							<span className="label-text">
+								Reservation Request Type
+							</span>
+						</div>
+						<div className="dropdown dropdown-bottom w-full">
+							<div
+								tabIndex={0}
+								role="button"
+								className="btn  bg-blue-500 hover:bg-blue-600 text-white w-full md:text-lg text-base"
+								onClick={() => setReqDropdown((p) => !p)}
+							>
+								{requestType != ""
+									? `${requestType} Request`
+									: "Choose Request Type"}
+							</div>
+							<ul
+								tabIndex={0}
+								hidden={!reqDropdown}
+								className="dropdown-content z-[1]  p-2  rounded-box w-full bg-white shadow-lg text-black text-lg max-h-52 overflow-y-scroll"
+							>
+								{["Standard", "Time"]?.map((data, i) => (
+									<li
+										key={i}
+										className="py-2 hover:bg-slate-300 hover:cursor-pointer"
+										onClick={() => {
+											setRequestType(data);
+											setReqDropdown(false);
+										}}
+									>
+										{data} Request
+									</li>
+								))}
+							</ul>
+						</div>
+
+						{errors.requestType && (
+							<p className="text-red-500 mt-2">
+								{errors.requestType}
+							</p>
+						)}
+					</div>
 				</div>
 
 				{requestType == "Time" && (
-					<div className="md:flex justify-between mt-4 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">
-									Tool Run Date
-								</span>
+					<>
+						<div className="h-8" />
+						<h2 className="text-xl font-bold text-start mb-2">
+							Tool Configuration
+						</h2>
+						<div className="grid md:grid-cols-2 grid-cols-1 space-x-4 md:space-y-0 space-y-4 px-6 pb-4 pt-2 bg-gray-700 items-end rounded-xl text-white dark:[color-scheme:dark]">
+							<div className="flex-col w-full">
+								<div className="label mt-1">
+									<span className="label-text">
+										Tool Run Date
+									</span>
+								</div>
+								<label className="input input-bordered flex items-center gap-2">
+									<input
+										type="date"
+										className="grow"
+										placeholder="Tool Date"
+										value={scriptDate}
+										onChange={(e) => {
+											setScriptDate(e.target.value);
+											setGameDate("");
+										}}
+									/>
+								</label>
+								{errors.scriptDate && (
+									<p className="text-red-500 mt-2">
+										{errors.scriptDate}
+									</p>
+								)}
 							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="date"
-									className="grow"
-									placeholder="Tool Date"
-									value={scriptDate}
-									onChange={(e) => {
-										setScriptDate(e.target.value);
-										setGameDate("");
-									}}
-								/>
-							</label>
-							{errors.scriptDate && (
-								<p className="text-red-500 mt-2">
-									{errors.scriptDate}
-								</p>
-							)}
-						</div>
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">
-									Tool Run Time
-								</span>
+							<div className="flex-col w-full">
+								<div className="label mt-1">
+									<span className="label-text">
+										Tool Run Time
+									</span>
+								</div>
+								<label className="input input-bordered flex items-center gap-2">
+									<input
+										type="time"
+										className="grow"
+										placeholder="Tool Time"
+										value={scriptTime}
+										onChange={(e) =>
+											setScriptTime(e.target.value)
+										}
+									/>
+								</label>
+								{errors.scriptTime && (
+									<p className="text-red-500 mt-2">
+										{errors.scriptTime}
+									</p>
+								)}
 							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="time"
-									className="grow"
-									placeholder="Tool Time"
-									value={scriptTime}
-									onChange={(e) =>
-										setScriptTime(e.target.value)
-									}
-								/>
-							</label>
-							{errors.scriptTime && (
-								<p className="text-red-500 mt-2">
-									{errors.scriptTime}
-								</p>
-							)}
 						</div>
-					</div>
+					</>
 				)}
 
-				<div className="bg-gray-700 p-4 text-white flex-col w-full rounded-xl">
-					<div className="label mt-1">
-						<span className="label-text">Reservation Name</span>
-					</div>
-					<label className="input input-bordered flex items-center gap-2">
-						<input
-							type="text"
-							className="grow"
-							placeholder="Reservation Name"
-							value={resName}
-							onChange={(e) => setResName(e.target.value)}
-						/>
-					</label>
-					{errors.resName && (
-						<p className="text-red-500 mt-2">{errors.resName}</p>
-					)}
-				</div>
-
-				<div className="md:flex justify-between mt-4 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl md:space-x-10">
-					<div className="flex-col w-full">
+				<div className="h-8" />
+				<h2 className="text-xl font-bold text-start mb-2">
+					Reservation Account Details
+				</h2>
+				<div className="grid md:grid-cols-2 grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4 px-6 pb-4 pt-2 bg-gray-700 text-white items-end rounded-xl">
+					<div className="flex-col ">
 						<div className="label mt-1">
 							<span className="label-text">
 								Booking Email Address
@@ -501,7 +540,7 @@ export default function ReservationForm() {
 							<p className="text-red-500 mt-2">{errors.email}</p>
 						)}
 					</div>
-					<div className="flex-col w-full">
+					<div className="flex-col ">
 						<div className="label mt-1">
 							<span className="label-text">
 								Booking Email Password
@@ -536,121 +575,128 @@ export default function ReservationForm() {
 					</div>
 				</div>
 
-				<div className="sm:flex sm:space-x-8 space-y-4 sm:space-y-0">
-					<div className="flex-1 bg-gray-700 p-4 text-white dark:[color-scheme:dark] rounded-xl  space-y-4">
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">Game Date</span>
-							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="date"
-									className="grow"
-									placeholder="Game Date"
-									min={scriptDate}
-									value={gameDate}
-									onChange={(e) =>
-										setGameDate(e.target.value)
-									}
-								/>
-							</label>
-							{errors.gameDate && (
-								<p className="text-red-500  mt-2">
-									{errors.gameDate}
-								</p>
-							)}
+				<div className="h-8" />
+				<h2 className="text-xl font-bold text-start mb-2">
+					Game Details
+				</h2>
+				<div
+					className="grid md:grid-cols-2 grid-cols-1 gap-x-6 gap-y-4 px-6 pb-4 pt-2 bg-gray-700 text-white items-end rounded-xl
+				dark:[color-scheme:dark]"
+				>
+					<div className="flex-col ">
+						<div className="label">
+							<span className="label-text">Game Date</span>
 						</div>
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">
-									Earliest Time
-								</span>
-							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="time"
-									className="grow"
-									placeholder="Earliest Time"
-									value={earliestTime}
-									onChange={(e) =>
-										setEarliestTime(e.target.value)
-									}
-								/>
-							</label>
-							{errors.earliestTime && (
-								<p className="text-red-500  mt-2">
-									{errors.earliestTime}
-								</p>
-							)}
-						</div>
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">Latest Time</span>
-							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="time"
-									className="grow"
-									placeholder="Latest Time"
-									value={latestTime}
-									onChange={(e) =>
-										setLatestTime(e.target.value)
-									}
-								/>
-							</label>
-							{errors.latestTime && (
-								<p className="text-red-500  mt-2">
-									{errors.latestTime}
-								</p>
-							)}
-						</div>
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">Player Count</span>
-							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="number"
-									className="grow"
-									placeholder="Player Count"
-									min={1}
-									value={playerCount}
-									onChange={(e) =>
-										setPlayerCount(e.target.value)
-									}
-								/>
-							</label>
-							{errors.playerCount && (
-								<p className="text-red-500  mt-2">
-									{errors.playerCount}
-								</p>
-							)}
-						</div>
-						<div className="flex-col w-full">
-							<div className="label mt-1">
-								<span className="label-text">Name</span>
-							</div>
-							<label className="input input-bordered flex items-center gap-2">
-								<input
-									type="text"
-									className="grow"
-									placeholder="Name"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-								/>
-							</label>
-							{errors.name && (
-								<p className="text-red-500  mt-2">
-									{errors.name}
-								</p>
-							)}
-						</div>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="date"
+								className="grow"
+								placeholder="Game Date"
+								min={scriptDate}
+								value={gameDate}
+								onChange={(e) => setGameDate(e.target.value)}
+							/>
+						</label>
+						{errors.gameDate && (
+							<p className="text-red-500  mt-2">
+								{errors.gameDate}
+							</p>
+						)}
 					</div>
-					<div className="flex-1  bg-gray-700  rounded-xl   p-4 text-white">
-						<span className="label-text text-lg font-bold">
-							Select Courses to Search
-						</span>
-						<div className="w-full text-black mt-6">
+					<div className="flex-col ">
+						<div className="label ">
+							<span className="label-text">Earliest Time</span>
+						</div>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="time"
+								className="grow"
+								placeholder="Earliest Time"
+								value={earliestTime}
+								onChange={(e) =>
+									setEarliestTime(e.target.value)
+								}
+							/>
+						</label>
+						{errors.earliestTime && (
+							<p className="text-red-500  mt-2">
+								{errors.earliestTime}
+							</p>
+						)}
+					</div>
+					<div className="flex-col ">
+						<div className="label ">
+							<span className="label-text">Latest Time</span>
+						</div>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="time"
+								className="grow"
+								placeholder="Latest Time"
+								value={latestTime}
+								onChange={(e) => setLatestTime(e.target.value)}
+							/>
+						</label>
+						{errors.latestTime && (
+							<p className="text-red-500  mt-2">
+								{errors.latestTime}
+							</p>
+						)}
+					</div>
+					<div className="flex-col ">
+						<div className="label ">
+							<span className="label-text">Player Count</span>
+						</div>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="number"
+								className="grow"
+								placeholder="Player Count"
+								min={1}
+								value={playerCount}
+								onChange={(e) => setPlayerCount(e.target.value)}
+							/>
+						</label>
+						{errors.playerCount && (
+							<p className="text-red-500  mt-2">
+								{errors.playerCount}
+							</p>
+						)}
+					</div>
+					<div className="flex-col ">
+						<div className="label ">
+							<span className="label-text">Name</span>
+						</div>
+						<label className="input input-bordered flex items-center gap-2">
+							<input
+								type="text"
+								className="grow"
+								placeholder="Name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</label>
+						{errors.name && (
+							<p className="text-red-500  mt-2">{errors.name}</p>
+						)}
+					</div>
+				</div>
+
+				<div className="h-8" />
+				<h2 className="text-xl font-bold text-start mb-2">
+					Game Course
+				</h2>
+				<div
+					className="grid md:grid-cols-2 grid-cols-1 gap-x-6 gap-y-4 px-6 pb-4 pt-2 bg-gray-700 text-white  rounded-xl
+				dark:[color-scheme:dark]"
+				>
+					<div>
+						<div className="label">
+							<span className="label-text">
+								Select Courses to Search
+							</span>
+						</div>
+						<div className="w-full text-black ">
 							<select
 								className="select select-primary w-full  bg-white"
 								value={selectCourse?.website_path}
@@ -719,8 +765,46 @@ export default function ReservationForm() {
 							</p>
 						)}
 					</div>
+					<div>
+						<label className="form-control w-full ">
+							<div className="label">
+								<span className="label-text">
+									Select Resident type (if applicable)
+								</span>
+							</div>
+							<select
+								className="select select-bordered"
+								onChange={(e) => {
+									setBookingClass(e.target.value);
+								}}
+								value={bookingClass}
+							>
+								{Object.keys(BOOKING_CLASS_DATA).map((k, i) => (
+									<option
+										key={`select-${i}`}
+										className="text-black"
+										value={
+											BOOKING_CLASS_DATA[
+												k as keyof typeof BOOKING_CLASS_DATA
+											]
+										}
+									>
+										{k}
+									</option>
+								))}
+							</select>
+						</label>
+					</div>
 				</div>
-				<div className="flex-col space-y-6 bg-gray-700 text-white dark:[color-scheme:dark] rounded-xl  p-6">
+
+				<div className="h-8" />
+				<h2 className="text-xl font-bold text-start mb-2">
+					Email Configuration
+				</h2>
+				<div
+					className="grid md:grid-cols-1 grid-cols-1 gap-x-6 gap-y-4 px-6 pb-4 pt-2 bg-gray-700 text-white  rounded-xl
+				dark:[color-scheme:dark]"
+				>
 					<div className="flex-col w-full">
 						<div className="label mt-1">
 							<span className="label-text">
@@ -766,25 +850,9 @@ export default function ReservationForm() {
 							onChange={(e) => setCcEmails(e.target.value)}
 						></textarea>
 					</div>
-
-					{/* <div className="form-control items-center ">
-						<label className="cursor-pointer label space-x-4">
-							<input
-								type="checkbox"
-								defaultChecked={true}
-								className="checkbox checkbox-success
-                                checkbox-md "
-								checked={hideInBackground}
-								onChange={(e) =>
-									setHideInBackground(e.target.checked)
-								}
-							/>
-							<span className="label-text text-lg">
-								Hide in Background
-							</span>
-						</label>
-					</div> */}
 				</div>
+
+				<div className="h-8" />
 
 				<div className="flex space-x-2 justify-center">
 					<button
@@ -793,12 +861,6 @@ export default function ReservationForm() {
 					>
 						Add Reservation
 					</button>
-					{/* <button
-						className="btn bg-red-500 hover:bg-red-400 w-1/3 text-lg h-16 text-white"
-						type="submit"
-					>
-						Stop
-					</button> */}
 				</div>
 			</form>
 		</div>
