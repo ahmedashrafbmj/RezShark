@@ -86,7 +86,7 @@ export default function ReservationForm() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [gameDate, setGameDate] = useState("");
-	const [bookingClass, setBookingClass] = useState("2140");
+	const [bookingClass, setBookingClass] = useState("Resident");
 	const [earliestTime, setEarliestTime] = useState("");
 	const [latestTime, setLatestTime] = useState("");
 	const [playerCount, setPlayerCount] = useState("");
@@ -783,11 +783,7 @@ export default function ReservationForm() {
 									<option
 										key={`select-${i}`}
 										className="text-black"
-										value={
-											BOOKING_CLASS_DATA[
-												k as keyof typeof BOOKING_CLASS_DATA
-											]
-										}
+										value={k}
 									>
 										{k}
 									</option>
