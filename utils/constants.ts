@@ -1,5 +1,5 @@
-const API_URL = "https://dev.rezshark.com";
-// const API_URL = "http://localhost:8000";
+// const API_URL = "https://dev.rezshark.com";
+const API_URL = "http://localhost:8000";
 
 const BOOKING_CLASS_DATA = {
 	Resident: "2140",
