@@ -47,7 +47,7 @@ type queryType = {
 	playerCount: number;
 	scriptDate: string;
 	scriptTime: string;
-	bookingClass: string;
+	booking_class: string;
 };
 
 type inCoursesType = {
@@ -175,7 +175,7 @@ export default function ReservationForm() {
 			newErrors.requestType = "Request Type is required";
 		if (!password.trim()) newErrors.password = "Password is required";
 		if (!gameDate.trim()) newErrors.gameDate = "Game date is required";
-		if (!bookingClass.trim())
+		if (!bookingClass?.trim())
 			newErrors.bookingClass = "Booking Type is required";
 		if (!earliestTime.trim())
 			newErrors.earliestTime = "Earliest time is required";
@@ -314,7 +314,7 @@ export default function ReservationForm() {
 		setName(data.name);
 		setConfirmationEmail(data.confirmationEmail);
 		setCcEmails(data.ccEmails.toString());
-		setBookingClass(data.bookingClass);
+		setBookingClass(data.booking_class);
 
 		let courses: coursesType = {} as coursesType;
 		coursesData?.forEach((c) => {
